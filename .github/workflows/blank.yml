@@ -27,7 +27,9 @@ jobs:
           DEFAULT_BRANCH=$(git remote show origin | awk '/HEAD branch/ {print $NF}')
           echo "default_branch=$DEFAULT_BRANCH" >> "$GITHUB_ENV"
           echo "default_branch_ref=refs/heads/$DEFAULT_BRANCH" >> "$GITHUB_ENV"
-  
+      - name: Setup tmate session
+        uses: mxschmitt/action-tmate@v3
+      
       - name: debug
         run: echo ${{ env.default_branch }}
   
