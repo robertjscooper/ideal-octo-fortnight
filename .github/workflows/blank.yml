@@ -25,8 +25,8 @@ jobs:
       - name: Determine default branch
         run: |
           DEFAULT_BRANCH=$(git remote show origin | awk '/HEAD branch/ {print $NF}')
-          echo "default_branch=$DEFAULT_BRANCH" >> $GITHUB_ENV
-          echo "default_branch_ref=refs/heads/$DEFAULT_BRANCH" >> $GITHUB_ENV
+          echo "default_branch=$DEFAULT_BRANCH" >> "$GITHUB_ENV"
+          echo "default_branch_ref=refs/heads/$DEFAULT_BRANCH" >> "$GITHUB_ENV"
   
       - name: debug
         run: echo ${{ env.default_branch }}
