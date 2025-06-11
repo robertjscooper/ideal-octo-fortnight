@@ -2,5 +2,5 @@
 set -ev
 trap 'exit' ERR
 
-echo "${docker_pass}" | docker login -u "${docker_user}" --password-stdin
-docker build -q -t ${TRAVIS_REPO_SLUG}  .
+echo "${DOCKER_PASSWORD}" | docker login -u "${DOCKER_USER}" --password-stdin
+docker build -q -t robertjscooper/ideal-octo-fortnight  .
