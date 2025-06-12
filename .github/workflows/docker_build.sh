@@ -27,8 +27,7 @@ if [ "${PR_STATE}" == "Closed" ]; then
     docker push "${GIT_REPO}:$GIT_TAG"
     git push origin "$GIT_TAG"
 
-    TOKEN=$(curl -s -H "Content-Type: application/json" -X POST -H "Content-Type: application/json" -d "{\"username\": \"${DOCKER_USER}\", \"password\":\"${DOCKER_PASSWORD}\"}"
-     "https://hub.docker.com/v2/users/login/" | jq -r .token)
+    TOKEN=$(curl -s -H "Content-Type: application/json" -X POST -H "Content-Type: application/json" -d "{\"username\": \"${DOCKER_USER}\", \"password\":\"${DOCKER_PASSWORD}\"}" "https://hub.docker.com/v2/users/login/" | jq -r .token)
     curl "https://hub.docker.com/v2/repositories/${TRAVIS_REPO_SLUG}/tags/$OLD_BRANCH/" -X DELETE -H "Authorization: JWT ${TOKEN}"
 elif [ "${PR_STATE}" == "Open" ]; then
     echo "PR State is: ${PR_STATE}"
