@@ -17,15 +17,16 @@ if [ "${PR_STATE}" == "Closed" ]; then
     GIT_TAG=$(( GIT_TAG + 1))
 
     docker tag "${GIT_REPO}:latest" "${GIT_REPO}:$GIT_TAG"
-    git tag "$GIT_TAG" -a -m "Release $GIT_TAG"
+    git tag -a "$GIT_TAG" -m "Release $GIT_TAG"
 
     echo "PR State is: ${PR_STATE}"
     echo "Branch Name is: ${BRANCH_NAME}"
     echo "Old Branch name: $OLD_BRANCH"
     echo "Git Tag will be: $GIT_TAG"
 
-    docker push "${GIT_REPO}:$GIT_TAG"
-    git push origin "$GIT_TAG"
+    docker push -q "${GIT_REPO}:$GIT_TAG"
+    git remote add origin-gha https://${GITHUB_TOKEN}@github.com/${GIT_REPO}.git
+    git push -q --tags --set-upstream origin-gha
 
     TOKEN=$(curl -s -H "Content-Type: application/json" -X POST -H "Content-Type: application/json" -d "{\"username\": \"${DOCKER_USER}\", \"password\":\"${DOCKER_PASSWORD}\"}" "https://hub.docker.com/v2/users/login/" | jq -r .token)
     curl "https://hub.docker.com/v2/repositories/${TRAVIS_REPO_SLUG}/tags/$OLD_BRANCH/" -X DELETE -H "Authorization: JWT ${TOKEN}"

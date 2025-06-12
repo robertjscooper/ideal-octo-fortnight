@@ -44,6 +44,7 @@ jobs:
         DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
         GIT_REPO: ${{ github.repository }}
         BRANCH_NAME: ${{ github.head_ref || github.ref_name }}
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         PR_STATE: Closed
       run: bash .github/workflows/docker_build.sh
 
