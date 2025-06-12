@@ -25,15 +25,17 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v4
       - name: Determine default branch
         run: |
           DEFAULT_BRANCH=$(git remote show origin | awk '/HEAD branch/ {print $NF}')
           echo "default_branch=$DEFAULT_BRANCH" >> "$GITHUB_ENV"
           echo "default_branch_ref=refs/heads/$DEFAULT_BRANCH" >> "$GITHUB_ENV"
-      
+
       - name: debug
         run: echo ${{ env.default_branch }}
-  
+
       # Runs a set of commands using the runners shell
       - name: run docker build script
         env: # Or as an environment variable
@@ -41,4 +43,4 @@ jobs:
           DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
         if: github.ref == env.default_branch_ref
         run: bash .github/workflows/docker_build.sh
-        
+
