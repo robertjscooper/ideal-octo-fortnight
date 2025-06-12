@@ -1,14 +1,21 @@
 # This is a basic workflow to help you get started with Actions
 
-name: CI
+name: PR - Open
 
 # Controls when the workflow will run
-on: [push, pull_request, workflow_dispatch]
+on:
+  pull_request:
+    types:
+      - opened
+      - edited
+      - reopened
+      - synchronize
+  workflow_dispatch:
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
   # This workflow contains a single job called "build"
-  lint-test:
+  lint:
     runs-on: ubuntu-latest
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
@@ -23,20 +30,13 @@ jobs:
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v4
-      # find and check this is the default branch
-      - name: Determine default branch
-        run: |
-          DEFAULT_BRANCH=$(git remote show origin | awk '/HEAD branch/ {print $NF}')
-          echo "default_branch=$DEFAULT_BRANCH" >> "$GITHUB_ENV"
-          echo "default_branch_ref=refs/heads/$DEFAULT_BRANCH" >> "$GITHUB_ENV"
-
       # Runs a set of commands using the runners shell
       - name: run docker build script
         env: # Or as an environment variable
           DOCKER_USER: ${{ secrets.DOCKER_USER }}
           DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
-          GIT_REPO: ${{ env.default_branch_ref }}
+          GIT_REPO: ${{ github.repository }}
           BRANCH_NAME: ${{ github.head_ref || github.ref_name }}
-        if: github.ref == env.default_branch_ref
+          PR_STATE: Open
         run: bash .github/workflows/docker_build.sh
 
