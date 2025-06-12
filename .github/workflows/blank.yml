@@ -38,6 +38,9 @@ jobs:
   
       # Runs a set of commands using the runners shell
       - name: run docker build script
+        env: # Or as an environment variable
+          DOCKER_USER: ${{ secrets.DOCKER_USER }}
+          DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
         if: github.ref == env.default_branch_ref
         run: bash .github/workflows/docker_build.sh
         
