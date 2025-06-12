@@ -25,7 +25,7 @@ if [ "${PR_STATE}" == "Closed" ]; then
     echo "Git Tag will be: $GIT_TAG"
 
     docker push -q "${GIT_REPO}:$GIT_TAG"
-    git remote add origin-gha https://${GITHUB_TOKEN}@github.com/${GIT_REPO}.git
+    git remote add origin-gha https://"${GITHUB_TOKEN}"@github.com/"${GIT_REPO}".git
     git push -q --tags --set-upstream origin-gha
 
     TOKEN=$(curl -s -H "Content-Type: application/json" -X POST -H "Content-Type: application/json" -d "{\"username\": \"${DOCKER_USER}\", \"password\":\"${DOCKER_PASSWORD}\"}" "https://hub.docker.com/v2/users/login/" | jq -r .token)
