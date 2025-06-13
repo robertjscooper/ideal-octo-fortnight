@@ -6,8 +6,9 @@ echo "${DOCKER_PASSWORD}" | docker login -u "${DOCKER_USER}" --password-stdin
 docker build --network=host -t "${GIT_REPO}:latest"  .
 
 if [ "${PR_STATE}" == "Closed" ]; then
-    COMMIT_MESSAGE=( $(git log -1 --pretty=format:"%s") )
-    OLD_BRANCH=$(basename "${COMMIT_MESSAGE[-1]}")
+    COMMIT_MESSAGE=$(git log -1 --pretty=format:"%s")
+    read -ra commit_array <<< "$COMMIT_MESSAGE"
+    OLD_BRANCH=$(basename "${commit_array[-1]}")
     git config --local user.email "action@github.com"
     git config --local user.name "GitHub Action"
 
