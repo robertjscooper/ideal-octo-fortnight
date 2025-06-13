@@ -4,6 +4,8 @@ trap 'exit' ERR
 
 echo "${DOCKER_PASSWORD}" | docker login -u "${DOCKER_USER}" --password-stdin
 docker build --network=host -t "${GIT_REPO}:latest"  .
+git remote add origin-gha https://"${GITHUB_TOKEN}"@github.com/"${GIT_REPO}".git
+git fetch origin-gha
 GIT_TAG=$(git tag | sort --version-sort | tail -n1)
 GIT_TAG=$(( GIT_TAG + 1))
 
@@ -22,7 +24,6 @@ if [ "${PR_STATE}" == "Closed" ]; then
     echo "Git Tag will be: $GIT_TAG"
 
     docker push -q "${GIT_REPO}:$GIT_TAG"
-    git remote add origin-gha https://"${GITHUB_TOKEN}"@github.com/"${GIT_REPO}".git
     git push -q --tags --set-upstream origin-gha
 
     TOKEN=$(curl -s -H "Content-Type: application/json" -X POST -H "Content-Type: application/json" -d "{\"username\": \"${DOCKER_USER}\", \"password\":\"${DOCKER_PASSWORD}\"}" "https://hub.docker.com/v2/users/login/" | jq -r .token)
