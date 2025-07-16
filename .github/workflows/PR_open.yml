@@ -28,18 +28,23 @@ jobs:
         uses: github/super-linter@v4
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-  build:
+  setup:
     runs-on: ubuntu-latest
     steps:
-      # Checks-out your repository under $GITHUB_WORKSPACE,
-      # so your job can access it
-      - uses: actions/checkout@v4
-      # Runs a set of commands using the runners shell
-      - name: run docker build script
-        env: # Or as an environment variable
-          DOCKER_USER: ${{ secrets.DOCKER_USER }}
-          DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
-          GIT_REPO: ${{ github.repository }}
-          BRANCH_NAME: ${{ github.head_ref || github.ref_name }}
-          PR_STATE: Open
-        run: bash .github/workflows/docker_build.sh
+      - name: Setup
+        uses: .github/actions/setup
+  # build:
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     # Checks-out your repository under $GITHUB_WORKSPACE,
+  #     # so your job can access it
+  #     - uses: actions/checkout@v4
+  #     # Runs a set of commands using the runners shell
+  #     - name: run docker build script
+  #       env: # Or as an environment variable
+  #         DOCKER_USER: ${{ secrets.DOCKER_USER }}
+  #         DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+  #         GIT_REPO: ${{ github.repository }}
+  #         BRANCH_NAME: ${{ github.head_ref || github.ref_name }}
+  #         PR_STATE: Open
+  #       run: bash .github/workflows/docker_build.sh
