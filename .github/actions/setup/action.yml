@@ -1,28 +1,32 @@
 name: BTL setup action
 runs:
   using: "composite"
-  runs-on: ubuntu-latest
   steps:
 
     - name: "Get Latest Tag"
       id: git-tag
+      shell: bash
       run: echo "git-tag=$(git describe --tags --abbrev=0 2> /dev/null)" >> $GITHUB_OUTPUT
 
     - name: "Increase Latest tag number by 1"
       id: git-proposed-tag
+      shell: bash
       run: echo "git-proposed-tag=$(( ${{ steps.git-tag.outputs.git-tag }} + 1 ))" >> $GITHUB_OUTPUT
 
     - name: "Get current branch"
       id: git-current-branch
+      shell: bash
       run: echo "git-current-branch=${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}" >> $GITHUB_OUTPUT
 
     - name: "Get old branch"
       id: git-old-branch
       if: github.event.pull_request.merged == true && steps.git-current-branch.outputs.git-current-branch == 'master'
+      shell: bash
       run: echo "git-old-branch=$(( ${{ github.event.pull_request.head.ref }} ))" >> $GITHUB_OUTPUT
 
     - name: "Propose Docker Image Tag
       id: docker-tag
+      shell: bash
       run:|
         [ "$current_branch" == "master" ] && echo 'docker-tag=latest,$(( ${{ steps.git-proposed-tag.outputs.git-proposed-tag }} ))' >> $GITHUB_OUTPUT || echo "docker-tag=$(( ${{ steps.git-current-branch.outputs.git-current-branch }} ))" >> $GITHUB_OUTPUT
 
