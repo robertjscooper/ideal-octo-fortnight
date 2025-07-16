@@ -42,6 +42,7 @@ jobs:
       git-proposed-tag: ${{ steps.git-proposed-tag.outputs.git-proposed-tag }}
       git-current-branch: ${{ steps.git-current-branch.outputs.git-current-branch }}
       git-old-branch: ${{ steps.git-old-branch.outputs.git-old-branch }}
+      docker-tags: ${{ steps.docker-tag.outputs.docker-tag }}
   build:
     runs-on: ubuntu-latest
     needs:
@@ -49,12 +50,15 @@ jobs:
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE,
       # so your job can access it
-    - name: Build and Push Docker Image
-      uses: docker/build-push-action@v6
-      with:
-        context: .
-        tags: ${{ needs.setup.outputs.docker-tags }}
-        push: true
-        # Set version to proposed tag if master, otherwise set version as branch name
-        build-args: version=${{ needs.setup.outputs.git-proposed-tag }}
+      - name: "Docker Tags"
+        shell: bash
+        run: echo "${{ needs.setup.outputs.docker-tags }}"
+      - name: Build and Push Docker Image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          tags: ${{ needs.setup.outputs.docker-tags }}
+          push: true
+          # Set version to proposed tag if master, otherwise set version as branch name
+          build-args: version=${{ needs.setup.outputs.git-proposed-tag }}
 
