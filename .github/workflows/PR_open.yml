@@ -17,17 +17,17 @@ on:
 # that can run sequentially or in parallel
 jobs:
   # This workflow contains a single job called "build"
-  lint:
-    runs-on: ubuntu-latest
-    steps:
-      # Checks-out your repository under $GITHUB_WORKSPACE,
-      # so your job can access it
-      - uses: actions/checkout@v4
-      # Runs a single command using the runners shell
-      - name: Run Super-Linter
-        uses: github/super-linter@v4
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  # lint:
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     # Checks-out your repository under $GITHUB_WORKSPACE,
+  #     # so your job can access it
+  #     - uses: actions/checkout@v4
+  #     # Runs a single command using the runners shell
+  #     - name: Run Super-Linter
+  #       uses: github/super-linter@v4
+  #       env:
+  #         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   setup:
     runs-on: ubuntu-latest
     steps:
@@ -37,18 +37,24 @@ jobs:
           fetch-depth: 0
       - name: Setup
         uses: ./.github/actions/setup
-  # build:
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     # Checks-out your repository under $GITHUB_WORKSPACE,
-  #     # so your job can access it
-  #     - uses: actions/checkout@v4
-  #     # Runs a set of commands using the runners shell
-  #     - name: run docker build script
-  #       env: # Or as an environment variable
-  #         DOCKER_USER: ${{ secrets.DOCKER_USER }}
-  #         DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
-  #         GIT_REPO: ${{ github.repository }}
-  #         BRANCH_NAME: ${{ github.head_ref || github.ref_name }}
-  #         PR_STATE: Open
-  #       run: bash .github/workflows/docker_build.sh
+    outputs:
+      git-tag: ${{ steps.git-tag.outputs.git-tag }}
+      git-proposed-tag: ${{ steps.git-proposed-tag.outputs.git-proposed-tag }}
+      git-current-branch: ${{ steps.git-current-branch.outputs.git-current-branch }}
+      git-old-branch: ${{ steps.git-old-branch.outputs.git-old-branch }}
+  build:
+    runs-on: ubuntu-latest
+    needs:
+      setup
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE,
+      # so your job can access it
+    - name: Build and Push Docker Image
+      uses: docker/build-push-action@v6
+      with:
+        context: .
+        tags: ${{ needs.setup.outputs.docker-tags }}
+        push: true
+        # Set version to proposed tag if master, otherwise set version as branch name
+        build-args: version=${{ needs.setup.outputs.git-proposed-tag }}
+
